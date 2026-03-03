@@ -1,0 +1,24 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: otel-agent
+  namespace: argocd
+spec:
+  project: test-apps-of-apps-project
+  sources:
+    - repoURL: 'https://open-telemetry.github.io/opentelemetry-helm-charts'
+      chart: opentelemetry-collector
+      targetRevision: 0.110.0 # Versión del chart
+      helm:
+        valueFiles:
+          - $values/values.yaml
+    - repoURL: 'https://github.com/aireir/otel-agent.git'
+      targetRevision: main
+      ref: values
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: argocd
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
